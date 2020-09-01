@@ -14,7 +14,12 @@ public class Main {
 
         try (FileInputStream stream = new FileInputStream(file)) {
             String[] tokens = MyReader.processText(stream, (int) file.length());
+            BST wordList = new BST();
 
+            for (String word : tokens)
+                wordList.insert(word);
+
+            wordList.inOrder();             // display everything in tree
         } catch (FileNotFoundException e) {
             System.out.println(filename + " not found.");
         } catch (IOException e) {
