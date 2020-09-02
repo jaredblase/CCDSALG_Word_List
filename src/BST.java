@@ -1,48 +1,30 @@
 public class BST {
-     // Attritubtes ::::::::::::::::::::::::::::::::::::::::::::::::::
+     // Attributes ::::::::::::::::::::::::::::::::::::::::::::::::::
     private Node root;
-
-
-     // Create / Constructor ::::::::::::::::::::::::::::::::::::::::::::::::::
-     
-    public BST() {                                                  
-        // Create()
-    }
-
 
     // Search ::::::::::::::::::::::::::::::::::::::::::::::::::
     
     // Root
-    public boolean search(String word) {
-        if(root == null) {                                          // No Root Node
-            return false;
-
-        } else if(word.equalsIgnoreCase(root.getWord())) {          // Word Found in Root Node
-            return true;
-
-        } else if(word.compareToIgnoreCase(root.getWord()) < 0){    // Search Left Sub Tree
-            return search(root.left, word);
-
-        } else {                                                    // Search Right Sub Tree
-            return search(root.right, word);
-
-        }
+    public Node search(String word) {
+        word = word.toLowerCase();
+        return search(root, word);
     }
 
     // Subtree
-    private boolean search(Node tree, String word) {
-        if(tree == null) {                                          // No Child Node
-            return false;
+    private Node search(Node node, String word) {
+        try {
+            if (word.equals(node.getWord())) {          // Word Found in Child BST.Node
+                return node;
 
-        } else if(word.equalsIgnoreCase(tree.getWord())) {          // Word Found in Child Node
-            return true;
+            } else if (word.compareTo(node.getWord()) < 0) {   // Search Left Sub Tree of Child BST.Node
+                return node.left == null ? node : search(node.left, word);
 
-        } else if(word.compareToIgnoreCase(tree.getWord()) < 0) {   // Search Left Sub Tree of Child Node
-            return search(tree.left, word);
+            } else {                                                    // Search Right Sub Tree of Child BST.Node
+                return node.right == null ? node : search(node.right, word);
 
-        } else {                                                    // Search Right Sub Tree of Child Node
-            return search(tree.right, word);
-            
+            }
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -50,39 +32,26 @@ public class BST {
     // Insert ::::::::::::::::::::::::::::::::::::::::::::::::::
     
     // Root
-    public void insert(String word) {   
-        if(root == null) {                                          // No Root Node then Create Root Node
-            root = new Node(word);
-
-        } else if(root.getWord().equalsIgnoreCase(word)) {          // Word Found in Root Node (Increment Count)
-            root.addCount();
-
-        } else if(word.compareToIgnoreCase(root.getWord()) < 0) {   // Word < Root Word
-            root.left = insert(root.left, word);
-
-        } else {                                                    // Word > Root Word
-            root.right = insert(root.right,word);
-
-        }
+    public void insert(String word) {
+        word = word.toLowerCase();
+        insert(search(word), word);
     }
 
     // Sub Trees
-    private Node insert(Node tree, String word) {
-        if(tree == null) {                                          // No Root Node then Create Root Node
-            tree = new Node(word);
+    private void insert(Node node, String word) {
+        if(node == null) {                                          // No Root BST.Node then Create Root BST.Node
+            root = new Node(word);
 
-        } else if(tree.getWord().equalsIgnoreCase(word)) {          // Word Found in Child Node (Increment)
-            tree.addCount();
+        } else if(node.getWord().equals(word)) {          // Word Found in Child BST.Node (Increment)
+            node.addCount();
 
-        } else if(word.compareToIgnoreCase(tree.getWord()) < 0) {   // Word < Root Word
-            tree.left = insert(tree.left, word);
+        } else if(word.compareTo(node.getWord()) < 0) {   // Word < Root Word
+            node.left = new Node(word);
 
         } else {                                                    // Word > Root Word
-            tree.right = insert(tree.right,word);
+            node.right = new Node(word);
 
         }
-
-        return tree;
     }
 
 
@@ -92,46 +61,28 @@ public class BST {
     public void inOrder() {
         // Column Heads
         System.out.format("%-30s - %-5s\n", "Word", "Count");
-        // Traverse Left of Root
-        try {
-            inOrder(root.left);
-        } catch (NullPointerException e) {
-            // Ignore
-        }
        
-        // Print The Root Node's Word & Count
-        try {
-             System.out.format("%-30s = %-5d\n", root.getWord(), root.getCount());
-        } catch (NullPointerException e) {
-            System.out.println("> No Root Node <");
-        }
-       
-        // Traverse Right of Root
-        try {
-            inOrder(root.right);
-        } catch (NullPointerException e) {
-            // Ignore
+        if (root == null) {
+           System.out.println("> No Root BST.Node <");
+        } else {
+           inOrder(root);
         }
     }
 
     // Sub Tree
     private void inOrder(Node tree) {
         // Traverse Left of Sub Tree
-        try {
+        if(tree.left != null) {
             inOrder(tree.left);
-        } catch (NullPointerException e) {
-            // Ignore
         }
+
           
-        // Print This Node's Word & Count
+        // Print This BST.Node's Word & Count
         System.out.format("%-30s = %-5d\n", tree.getWord(), tree.getCount());
 
         // Traverse Right of Sub Tree
-        try {
-           
+        if(tree.right != null) {
             inOrder(tree.right);
-        } catch (NullPointerException e) {
-            // Ignore
         }
     }
 
@@ -140,102 +91,122 @@ public class BST {
     
     // Root
     public void destroy(String word) {
-        if(root == null) {                                          // Empty Tree
-            System.out.println("> Empty Tree <");
+        Node toReplace;
 
-        } else if(word.equalsIgnoreCase(root.getWord())) {          // Word Found, Destroy Node
+        if(root.getWord().equals(word)) {
+            toReplace = getSuccessor(root);
 
-            if(root.left == null && root.right == null) {           // Case '1' Root Node has no Children
-                root = null;
+            if (toReplace != null) {
+                Node temp = getParent(root, toReplace);
+                if (toReplace.equals(temp.left)) {
+                    temp.left = null;
+                } else {
+                    temp.right = null;
+                }
 
-            } else if(root.left != null && root.right != null) {    // Case '2' Root Node has 2 Children
-
-                Node temp = getHighestNode(root, word);             // Obtain the next highest node
-
-                temp.left = root.left;                              // Set Leaf Node Left Tree to Root Node Left Tree
-                temp.right = root.right;                            // Set Leaf Node Right Tree to Root Node Right Tree
-
-                destroy(temp.getWord());                            // Delete the Old Highest Leaf Node (Which is Now the New Root Node of this Tree)
-                root = temp;                                        // Change Root
-
-                System.out.println("> Word is Removed <");
-
-            } else {                                                // Case '3' Root Node has 1 Child
-                if(root.left != null) {                             // Case '3.1' Left Sub Tree is the Only Child
-                    root = root.left;
-
-                } else {                                            // Case '3.2' Right Sub Tree is the Only Child
-                    root = root.right;    
-
-                }   
-            }      
-        } else if(word.compareToIgnoreCase(root.getWord()) < 0) {   // Search & Destroy Word in Left Sub Tree
-            root.left = destroy(root.left, word);
-
-        } else {                                                    // Search & Destroy Word in Right Sub Tree
-            root.right = destroy(root.right, word);
-
-        }
-    }
-
-    // Sub Tree
-    private Node destroy(Node tree, String word) {
-        if(tree == null) {                                          // Empty Tree
-            System.out.println("> The Word (" + word + ") is Not in This Tree <");
-
-        } else if(word.equalsIgnoreCase(tree.getWord())) {          // Word Found, Destroy Node
-
-            if(tree.left == null && tree.right == null) {           // Case '1' Sub Root Node has no Children
-                tree = null;
-
-            } else if(tree.left != null && tree.right != null) {    // Case '2' Sub Root Node has 2 Children
-
-                Node temp = getHighestNode(tree, word);             // Obtain the next highest node
-
-                temp.left = tree.left;                              // Set Leaf Node Left Tree to Root Node Left Tree
-                temp.right = tree.right;                            // Set Leaf Node Right Tree to Root Node Right Tree
-
-                destroy(temp.getWord());                            // Delete the Old Highest Leaf Node (Which is Now the New Root Node of this Tree)
-
-                tree = temp;                                        // Change Sub Root
-
-            } else {                                                // Case '3' Root Node has 1 Child
-                if(tree.left != null) {                             // Case '3.1' Left Sub Tree is the Only Child
-                    tree = tree.left;                               
-                } else {                                            // Case '3.2' Right Sub Tree is the Only Child
-                    tree = tree.right;                              
-                }   
-            }      
-        } else if(word.compareToIgnoreCase(tree.getWord()) < 0) {   // Search & Destroy Word in Left Sub Tree
-            tree.left = destroy(tree.left, word);
-
-        } else {                                                    // Search & Destroy Word in Right Sub Tree
-            tree.right = destroy(tree.right, word);
-
-        }
-
-        return tree;
-    }
-
-
-    private Node getHighestNode(Node tree, String word) {
-
-        if(tree.left == null && tree.right == null) {                                       // Leaf Node
-            Node temp = new Node(tree.getWord());
-
-            for(int i = 1; i < tree.getCount(); i++) {
-                temp.addCount();
-                System.out.println("sup");
+                toReplace.left = root.left;
+                toReplace.right = root.right;
             }
 
-            return temp;
+            root = toReplace;
+            return;
+        }
 
-        } else if(tree.left != null && word.compareToIgnoreCase(tree.left.getWord()) < 0) { // Left Node is Bigger
-            return getHighestNode(tree.left, word); 
+        Node toDestroy = new Node(word);
+        Node parent = getParent(root, toDestroy);
 
+        try {
+            toDestroy = toDestroy.equals(parent.left)? parent.left : parent.right;
+            toReplace = getSuccessor(toDestroy);
+
+            if (toReplace != null) {
+                Node temp = getParent(root, toReplace);
+                if (toReplace.equals(temp.left)) {
+                    temp.left = null;
+                } else {
+                    temp.right = null;
+                }
+
+                toReplace.left = toDestroy.left;
+                toReplace.right = toDestroy.right;
+            }
+
+            if (toDestroy.equals(parent.left)) {
+                parent.left = toReplace;
+            } else {
+                parent.right = toReplace;
+            }
+        } catch (Exception e) {
+            System.out.println("Word does not exist!");
+        }
+
+    }
+
+    public Node getParent(Node node, Node child) {
+        try {
+            if (child.equals(node.left) || child.equals(node.right)) {          // Parent found
+                return node;
+
+            } else if (node.compareTo(child) > 0) {   // Search Left Sub Tree of Child BST.Node
+                return node.left == null ? node : getParent(node.left, child);
+
+            } else {                                                    // Search Right Sub Tree of Child BST.Node
+                return node.right == null ? node : getParent(node.right, child);
+
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Node getHighestNode(Node node) {
+        return node.right == null? node : getHighestNode(node.right);
+    }
+
+    public Node getSuccessor(Node node) {
+        node = search(node.getWord());
+        if (node.left == null) {
+            return node.right;
         } else {
-            return getHighestNode(tree.right, word);        
+            return getHighestNode(node.left);
+        }
+    }
 
-        } 
-    }   
+    public static class Node implements Comparable<Node> {
+        public Node left;
+        public Node right;
+        private final String word;
+        private int count;
+
+        public Node(String word) {
+            this.word = word;
+            count = 1;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public String getWord() {
+            return word;
+        }
+
+        public void addCount() {
+             count++;
+        }
+
+        @Override
+        public int compareTo(Node node) {
+            return word.compareTo(node.word);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Node && word.equals(((Node) obj).word);
+        }
+
+        public void printNode() {
+            System.out.format("%-30s = %-5d\n", word, count);
+        }
+    }
 }

@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner input = new Scanner("System.in");
+        Scanner input = new Scanner(System.in);
 
         System.out.print("Input filename: ");
         String filename = input.nextLine();
@@ -16,8 +16,11 @@ public class Main {
             String[] tokens = MyReader.processText(stream, (int) file.length());
             BST wordList = new BST();
 
-            for (String word : tokens)
-                wordList.insert(word);
+            for (String word : tokens) {
+                if (word.length() >= 3) {
+                    wordList.insert(word);
+                }
+            }
 
             wordList.inOrder();             // display everything in tree
         } catch (FileNotFoundException e) {
