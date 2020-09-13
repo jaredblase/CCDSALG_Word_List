@@ -1,63 +1,42 @@
 public class BST {
-     // Attributes ::::::::::::::::::::::::::::::::::::::::::::::::::
     private Node root;
 
-    // Search ::::::::::::::::::::::::::::::::::::::::::::::::::
-    
-    // Root
     public Node search(String word) {
         word = word.toLowerCase();
         return search(root, word);
     }
 
-    // Subtree
     private Node search(Node node, String word) {
         try {
             if (word.equals(node.getWord())) {          // Word Found in Child BST.Node
                 return node;
-
             } else if (word.compareTo(node.getWord()) < 0) {   // Search Left Sub Tree of Child BST.Node
                 return node.left == null ? node : search(node.left, word);
-
             } else {                                                    // Search Right Sub Tree of Child BST.Node
                 return node.right == null ? node : search(node.right, word);
-
             }
         } catch (Exception e) {
             return null;
         }
     }
 
-
-    // Insert ::::::::::::::::::::::::::::::::::::::::::::::::::
-    
-    // Root
     public void insert(String word) {
         word = word.toLowerCase();
         insert(search(word), word);
     }
 
-    // Sub Trees
     private void insert(Node node, String word) {
         if(node == null) {                                          // No Root BST.Node then Create Root BST.Node
             root = new Node(word);
-
         } else if(node.getWord().equals(word)) {          // Word Found in Child BST.Node (Increment)
             node.addCount();
-
         } else if(word.compareTo(node.getWord()) < 0) {   // Word < Root Word
             node.left = new Node(word);
-
         } else {                                                    // Word > Root Word
             node.right = new Node(word);
-
         }
     }
 
-
-    // inOrder :::::::::::::::::::::::::
-    
-    // Root
     public void inOrder() {
         // Column Heads
         System.out.format("%-30s - %-5s\n", "Word", "Count");
@@ -69,13 +48,11 @@ public class BST {
         }
     }
 
-    // Sub Tree
     private void inOrder(Node tree) {
         // Traverse Left of Sub Tree
         if(tree.left != null) {
             inOrder(tree.left);
         }
-
           
         // Print This BST.Node's Word & Count
         System.out.format("%-30s = %-5d\n", tree.getWord(), tree.getCount());
@@ -86,10 +63,6 @@ public class BST {
         }
     }
 
-
-    // Destroy ::::::::::::::::::::::::::::::::::::::::::::::::::
-    
-    // Root
     public void destroy(String word) {
         Node toReplace;
 
@@ -172,6 +145,9 @@ public class BST {
         }
     }
 
+    /**
+     * The Node class is an inner class because it cannot exist outside of the Tree.
+     */
     public static class Node implements Comparable<Node> {
         public Node left;
         public Node right;
