@@ -1,3 +1,14 @@
-Hello, how are you today? I'm fine, thank you! How about you?
-
-Today is the present. Tomorrow is a gift.
+about                          = 1    
+are                            = 3    
+fine                           = 1    
+gift                           = 1    
+good                           = 1    
+hello                          = 1    
+how                            = 3    
+looool                         = 1    
+present                        = 1    
+thank                          = 1    
+the                            = 1    
+today                          = 2    
+tomorrow                       = 1    
+you                            = 5    
