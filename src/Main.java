@@ -12,12 +12,12 @@ public class Main {
         String filename = input.nextLine();
         File file = new File(filename);
 
-        try (FileInputStream stream = new FileInputStream(file)) {
-            String[] tokens = MyReader.processText(stream, (int) file.length());
-            BST wordList = new BST();
+        try (FileInputStream stream = new FileInputStream(file)) {                  // try and open the file as an input stream
+            String[] tokens = MyReader.processText(stream, (int) file.length());    // receive the tokens from MyReader
+            BST wordList = new BST();                                               // initialize tree
 
             for (String word : tokens) {
-                if (word.length() >= 3) {
+                if (word.length() >= 3) {   // only counts words with length >= 3
                     wordList.insert(word);
                 }
             }
