@@ -1,7 +1,4 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 public class Main {
@@ -18,11 +15,19 @@ public class Main {
 
             for (String word : tokens) {
                 if (word.length() >= 3) {   // only counts words with length >= 3
-                    wordList.insert(word);
+                    wordList.add(word);
                 }
             }
 
-            wordList.inOrder();             // display everything in tree
+            try (FileWriter writer = new FileWriter(new File("WORDS.txt"))) {   // write to WORDS.txt
+                for(BST.Node node : wordList.inOrder()) {
+                    writer.write(node.toString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            wordList.destroy();     // removes the tree from memory
         } catch (FileNotFoundException e) {
             System.out.println(filename + " not found.");
         } catch (IOException e) {
