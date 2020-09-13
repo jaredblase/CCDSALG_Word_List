@@ -3,8 +3,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * The MyReader class has one method that takes in an input stream and retrieves all
- * the words as tokens using spaces as the separator.
+ * The MyReader class has one method that takes in an input stream (such as a text file)
+ * and retrieves all the words as tokens using spaces as the separator.
  */
 public class MyReader {
     /**
