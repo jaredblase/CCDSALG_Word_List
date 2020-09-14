@@ -1,212 +1,226 @@
+import java.util.ArrayList;
+
+/**
+ * This class is a binary search tree class.
+ * It contains an inner class Node.
+ */
 public class BST {
-     // Attributes ::::::::::::::::::::::::::::::::::::::::::::::::::
+    /** The root node. */
     private Node root;
 
-    // Search ::::::::::::::::::::::::::::::::::::::::::::::::::
-    
-    // Root
-    public Node search(String word) {
-        word = word.toLowerCase();
-        return search(root, word);
+    /**
+     * Handles the processing of the keywords.
+     * @param word the key to be processed by the tree.
+     */
+    public void add(String word) {
+        Node toFind = new Node(word.toLowerCase());
+        Node node = search(word);
+
+        if (node == null) {         // if not found
+            insert(root, toFind);
+        } else {
+            node.addCount();        // increment count of instance
+        }
     }
 
-    // Subtree
-    private Node search(Node node, String word) {
+    /**
+     * Calls search(Node) and passes the word wrapped in the Node class.
+     * @param word the keyword to be searched in the tree.
+     * @return the Node instance pointer if it is found, null otherwise.
+     */
+    public Node search(String word) {
+        return search(new Node(word.toLowerCase()));
+    }
+
+    /**
+     * Calls search(Node, Node) and passes the root as the parent node and the node instance
+     * to be searched in the tree.
+     * @param toFind the node instance to be searched in the tree.
+     * @return the Node instance pointer in the tree if it is found, null otherwise.
+     */
+    public Node search(Node toFind) {
+        return search(root, toFind);
+    }
+
+    /**
+     * Searches the tree for an instance of a parentNode.
+     * @param parentNode the parent node.
+     * @param toFind the node to be searched for.
+     * @return the node instance pointer if found, null otherwise.
+     */
+    private Node search(Node parentNode, Node toFind) {
         try {
-            if (word.equals(node.getWord())) {          // Word Found in Child BST.Node
-                return node;
-
-            } else if (word.compareTo(node.getWord()) < 0) {   // Search Left Sub Tree of Child BST.Node
-                return node.left == null ? node : search(node.left, word);
-
+            if (parentNode.equals(toFind)) {                            // Word Found in Child BST.Node
+                return parentNode;
+            } else if (parentNode.compareTo(toFind) > 0) {              // Search Left Sub Tree of Child BST.Node
+                return search(parentNode.left, toFind);
             } else {                                                    // Search Right Sub Tree of Child BST.Node
-                return node.right == null ? node : search(node.right, word);
-
+                return search(parentNode.right, toFind);
             }
         } catch (Exception e) {
             return null;
         }
     }
 
-
-    // Insert ::::::::::::::::::::::::::::::::::::::::::::::::::
-    
-    // Root
-    public void insert(String word) {
-        word = word.toLowerCase();
-        insert(search(word), word);
-    }
-
-    // Sub Trees
-    private void insert(Node node, String word) {
-        if(node == null) {                                          // No Root BST.Node then Create Root BST.Node
-            root = new Node(word);
-
-        } else if(node.getWord().equals(word)) {          // Word Found in Child BST.Node (Increment)
-            node.addCount();
-
-        } else if(word.compareTo(node.getWord()) < 0) {   // Word < Root Word
-            node.left = new Node(word);
-
-        } else {                                                    // Word > Root Word
-            node.right = new Node(word);
-
+    /**
+     * Inserts a parentNode into the tree
+     * @param parentNode the parent parentNode.
+     * @param newNode the node to be inserted.
+     */
+    private void insert(Node parentNode, Node newNode) {
+        try {
+            if (parentNode.compareTo(newNode) > 0) {
+                if (parentNode.left == null) {
+                    parentNode.left = newNode;
+                } else {
+                    insert(parentNode.left, newNode);
+                }
+            } else {
+                if(parentNode.right == null) {
+                    parentNode.right = newNode;
+                } else {
+                    insert(parentNode.right, newNode);
+                }
+            }
+        } catch (NullPointerException e) { // catches an exception when parentNode is null (only happens when root is null)
+            root = newNode;
         }
     }
 
+    /**
+     * Returns the list of nodes in the tree in in-order fashion.
+     * @return the list of nodes in the tree.
+     */
+    public ArrayList<Node> inOrder() {
+        ArrayList<Node> nodeList = null;
 
-    // inOrder :::::::::::::::::::::::::
-    
-    // Root
-    public void inOrder() {
-        // Column Heads
-        System.out.format("%-30s - %-5s\n", "Word", "Count");
-       
         if (root == null) {
            System.out.println("> No Root BST.Node <");
         } else {
-           inOrder(root);
+            nodeList = new ArrayList<>();
+            inOrder(root, nodeList);
+        }
+
+        return nodeList;
+    }
+
+    /**
+     * Adds the nodes to the ArrayList by in-order transversal.
+     * @param node the parent node.
+     * @param nodeList the ArrayList to contain all the nodes.
+     */
+    private void inOrder(Node node, ArrayList<Node> nodeList) {
+        if(node.left != null) {         // Traverse Left of Sub Tree
+            inOrder(node.left, nodeList);
+        }
+
+        nodeList.add(node);             // Add node
+
+        if(node.right != null) {        // Traverse Right of Sub Tree
+            inOrder(node.right, nodeList);
         }
     }
 
-    // Sub Tree
-    private void inOrder(Node tree) {
-        // Traverse Left of Sub Tree
-        if(tree.left != null) {
-            inOrder(tree.left);
-        }
-
-          
-        // Print This BST.Node's Word & Count
-        System.out.format("%-30s = %-5d\n", tree.getWord(), tree.getCount());
-
-        // Traverse Right of Sub Tree
-        if(tree.right != null) {
-            inOrder(tree.right);
-        }
+    /**
+     * Calls max(Node) and passes the tree's root to look for the node
+     * with the highest value.
+     * @return the pointer to the Node instance with the greatest value.
+     */
+    public Node max() {
+        return max(root);
     }
 
-
-    // Destroy ::::::::::::::::::::::::::::::::::::::::::::::::::
-    
-    // Root
-    public void destroy(String word) {
-        Node toReplace;
-
-        if(root.getWord().equals(word)) {
-            toReplace = getSuccessor(root);
-
-            if (toReplace != null) {
-                Node temp = getParent(root, toReplace);
-                if (toReplace.equals(temp.left)) {
-                    temp.left = null;
-                } else {
-                    temp.right = null;
-                }
-
-                toReplace.left = root.left;
-                toReplace.right = root.right;
-            }
-
-            root = toReplace;
-            return;
-        }
-
-        Node toDestroy = new Node(word);
-        Node parent = getParent(root, toDestroy);
-
-        try {
-            toDestroy = toDestroy.equals(parent.left)? parent.left : parent.right;
-            toReplace = getSuccessor(toDestroy);
-
-            if (toReplace != null) {
-                Node temp = getParent(root, toReplace);
-                if (toReplace.equals(temp.left)) {
-                    temp.left = null;
-                } else {
-                    temp.right = null;
-                }
-
-                toReplace.left = toDestroy.left;
-                toReplace.right = toDestroy.right;
-            }
-
-            if (toDestroy.equals(parent.left)) {
-                parent.left = toReplace;
-            } else {
-                parent.right = toReplace;
-            }
-        } catch (Exception e) {
-            System.out.println("Word does not exist!");
-        }
-
+    /**
+     * Searches the tree and returns the node with the highest value.
+     * @param node the parent node.
+     * @return the pointer to the Node instance with the greatest value.
+     */
+    public Node max(Node node) {
+        return (node.right == null)? node : max(node.right);
     }
 
-    public Node getParent(Node node, Node child) {
-        try {
-            if (child.equals(node.left) || child.equals(node.right)) {          // Parent found
-                return node;
-
-            } else if (node.compareTo(child) > 0) {   // Search Left Sub Tree of Child BST.Node
-                return node.left == null ? node : getParent(node.left, child);
-
-            } else {                                                    // Search Right Sub Tree of Child BST.Node
-                return node.right == null ? node : getParent(node.right, child);
-
-            }
-        } catch (Exception e) {
-            return null;
-        }
+    /**
+     * Removes the tree from memory.
+     */
+    public void destroy() {
+        root = null;
+        System.gc();
     }
 
-    private Node getHighestNode(Node node) {
-        return node.right == null? node : getHighestNode(node.right);
-    }
-
-    public Node getSuccessor(Node node) {
-        node = search(node.getWord());
-        if (node.left == null) {
-            return node.right;
-        } else {
-            return getHighestNode(node.left);
-        }
-    }
-
+    /**
+     * The Node class is an inner class because it cannot exist outside of the Tree. The class contains
+     * a left and a right Node, the key, and a count. Also implements the Comparable interface and compares
+     * the keys of the node to the other Node's.
+     */
     public static class Node implements Comparable<Node> {
-        public Node left;
-        public Node right;
-        private final String word;
+        /** Pointer to the left child */
+        private Node left;
+        /** Pointer to the right child */
+        private Node right;
+        /** The key of the node */
+        private final String WORD;
+        /** The number of times this word was added to the tree */
         private int count;
 
+        /**
+         * This constructor sets the word attribute and initializes the count to 1.
+         * @param word the word to set the key of the Node.
+         */
         public Node(String word) {
-            this.word = word;
+            this.WORD = word;
             count = 1;
         }
 
+        /**
+         * Returns the key of the node.
+         * @return the key of the node.
+         */
+        public String getWord() {
+            return WORD;
+        }
+
+        /**
+         * Returns the count of the node.
+         * @return the count of the node.
+         */
         public int getCount() {
             return count;
         }
 
-        public String getWord() {
-            return word;
-        }
-
+        /**
+         * Increments the count by 1.
+         */
         public void addCount() {
              count++;
         }
 
+        /**
+         * Compares the keys and returns the result from the comparison.
+         * @param node the node to compare with this node.
+         * @return the comparison of the keys.
+         */
         @Override
         public int compareTo(Node node) {
-            return word.compareTo(node.word);
+            return WORD.compareToIgnoreCase(node.WORD);
         }
 
+        /**
+         * Compares if the keys of both nodes are equal (the same string, case-insensitive).
+         * @param obj the Object to be compared.
+         * @return if the keys are equal.
+         */
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Node && word.equals(((Node) obj).word);
+            return obj instanceof Node && WORD.equalsIgnoreCase(((Node) obj).WORD);
         }
 
-        public void printNode() {
-            System.out.format("%-30s = %-5d\n", word, count);
+        /**
+         * Return a formatted String.
+         * @return formatted String containing the key and the count.
+         */
+        @Override
+        public String toString() {
+            return String.format("%-30s = %-5d\n", WORD, count);
         }
     }
 }
