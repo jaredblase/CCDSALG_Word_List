@@ -19,7 +19,7 @@ public class MyReader {
         stream.read(text);
 
         String words = new String(text, StandardCharsets.UTF_8);
-        words = words.replaceAll("\\W", " ");       // converts all non-word characters to spaces
+        words = words.replaceAll("[\\W\\d]", " ");       // converts all non-word characters to spaces
         words = words.trim();                                       // removes excess space before and after the String
 
         return words.split("\\s+");                            // returns the tokens, using space as the separator
